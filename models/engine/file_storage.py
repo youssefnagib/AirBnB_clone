@@ -4,6 +4,7 @@
 Contains the FileStorage Class
 """
 import json
+from models.base_model import BaseModel
 
 
 class FileStorage:
