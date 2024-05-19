@@ -5,6 +5,12 @@ import models
 import re
 from shlex import split
 from models import storage
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 """console.py  that contains the entry point of the command interprete"""
 
 
@@ -29,21 +35,21 @@ def parse(arg):
 class HBNBCommand(cmd.Cmd):
     """The command line """
     prompt = "(hbnb) "
-    __class_names = [
-        "Amenity",
-        "BaseModel",
-        "City",
-        "Place",
-        "Review",
-        "State",
-        "User"
-    ]
+    __class_names = {
+        "Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+                 "Place": Place, "Review": Review, "State": State, "User": User
+    }
+    # __classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+    #              "Place": Place, "Review": Review, "State": State, "User": User}
 
     def do_quit(self, arg):
-        """Quit /EOF command to exit the program"""
+        """Quit command is to exit the program"""
         return True
 
-    do_EOF = do_quit
+    def do_EOF(self, arg):
+        """EOF command to exit the program"""
+        print()
+        exit()
 
     def emptyline(self):
         """if empty line + ENTER should not execute anything"""
@@ -60,7 +66,7 @@ class HBNBCommand(cmd.Cmd):
         elif arg[0] not in self.__class_names:
             print("** class doesn't exist **")
         else:
-            creates__new_instance = self.__classes[arg[0]]()
+            creates__new_instance = self.__class_names[arg[0]]()
             models.storage.save()
             print(creates__new_instance.id)
 
@@ -139,7 +145,7 @@ class HBNBCommand(cmd.Cmd):
         if len(argl) == 0:
             print("** class name missing **")
             return False
-        if argl[0] not in HBNBCommand.__classes:
+        if argl[0] not in HBNBCommand.__class_names:
             print("** class doesn't exist **")
             return False
         if len(argl) == 1:
