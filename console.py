@@ -27,7 +27,7 @@ def parse(arg):
 
 class HBNBCommand(cmd.Cmd):
     """The command line """
-    prmt = "(hbnb) "
+    prompt = "(hbnb) "
     __class_names = [
         "Amenity",
         "BaseModel",
