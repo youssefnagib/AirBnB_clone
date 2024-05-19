@@ -14,7 +14,7 @@ First we make command interpreter for managing clone objects :-
 1- Create 2- Retrieve 3- Operate 4- Update 5- Destroy
 
 Installation :-
-Clone the repo: git clone "https://github.com/osamablal/AirBnB_clone.git"
+Clone the repo: git clone "https://github.com/youssefnagib/AirBnB_clone.git"
 Access Air-Bnb dir : cd AirBnB_clone
 Run hbnb interactive : ./console and enter command
 Run hbnb non interactive : echo "<command>" | ./console.py
