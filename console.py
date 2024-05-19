@@ -2,8 +2,28 @@ from models.base_model import BaseModel
 import cmd
 import shlex
 import models
+import re
+from shlex import split
+from models import storage
 """console.py  that contains the entry point of the command interprete"""
 
+
+def parse(arg):
+        curly_braces = re.search(r"\{(.*?)\}", arg)
+        brackets = re.search(r"\[(.*?)\]", arg)
+        if curly_braces is None:
+            if brackets is None:
+                return [i.strip(",") for i in split(arg)]
+            else:
+                lexer = split(arg[:brackets.span()[0]])
+                retl = [i.strip(",") for i in lexer]
+                retl.append(brackets.group())
+                return retl
+        else:
+            lexer = split(arg[:curly_braces.span()[0]])
+            retl = [i.strip(",") for i in lexer]
+            retl.append(curly_braces.group())
+            return retl
 
 class HBNBCommand(cmd.Cmd):
     """The command line """
@@ -112,21 +132,48 @@ class HBNBCommand(cmd.Cmd):
         Updates an instance based on the class name
         and id by adding or updating attribute
         """
-        opject = models.storage.all()
-        arg = arg.split(" ")
+        argl = parse(arg)
+        objdict = storage.all()
 
-        if len(arg) == 0:
+        if len(argl) == 0:
             print("** class name missing **")
-        elif arg[0] not in self.__class_names:
+            return False
+        if argl[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
-        elif len(arg) == 1:
+            return False
+        if len(argl) == 1:
             print("** instance id missing **")
-        elif len(arg) == 2:
+            return False
+        if "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
+            print("** no instance found **")
+            return False
+        if len(argl) == 2:
             print("** attribute name missing **")
-        elif len(arg) == 3:
-            print("** value missing **")
-        else:
-            pass
+            return False
+        if len(argl) == 3:
+            try:
+                type(eval(argl[2])) != dict
+            except NameError:
+                print("** value missing **")
+                return False
+
+        if len(argl) == 4:
+            obj = objdict["{}.{}".format(argl[0], argl[1])]
+            if argl[2] in obj.__class__.__dict__.keys():
+                valtype = type(obj.__class__.__dict__[argl[2]])
+                obj.__dict__[argl[2]] = valtype(argl[3])
+            else:
+                obj.__dict__[argl[2]] = argl[3]
+        elif type(eval(argl[2])) == dict:
+            obj = objdict["{}.{}".format(argl[0], argl[1])]
+            for k, v in eval(argl[2]).items():
+                if (k in obj.__class__.__dict__.keys() and
+                        type(obj.__class__.__dict__[k]) in {str, int, float}):
+                    valtype = type(obj.__class__.__dict__[k])
+                    obj.__dict__[k] = valtype(v)
+                else:
+                    obj.__dict__[k] = v
+        storage.save()
 
 
 if __name__ == '__main__':
