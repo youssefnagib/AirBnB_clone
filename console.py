@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""console.py that contains the entry point of the command interpreter"""
 from models.base_model import BaseModel
 import cmd
 import shlex
