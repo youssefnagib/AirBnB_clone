@@ -13,6 +13,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import sys
 """console.py  that contains the entry point of the command interprete"""
 
 
@@ -44,7 +45,20 @@ class HBNBCommand(cmd.Cmd):
     # __class_names = {"Amenity": Amenity, "BaseModel": BaseModel,
     # "City": City, "Place": Place, "Review": Review,
     # "State": State, "User": User}
+    __flag = 0
 
+    def precmd(self, line):
+        """ Edit given command to allow second type of input"""
+        if not sys.stdin.isatty():
+            print()
+        if '.' in line:
+            HBNBCommand.__flag = 1
+            line = line.replace('.', ' ').replace('(', ' ').replace(')', ' ')
+            cmd_argv = line.split()
+            cmd_argv[0], cmd_argv[1] = cmd_argv[1], cmd_argv[0]
+            line = " ".join(cmd_argv)
+        return cmd.Cmd.precmd(self, line)
+    
     def do_quit(self, arg):
         """ Quit command is to exit the program """
         return True
@@ -92,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
                 print(show_class[key])
             else:
                 print("** no instance found **")
-
+    
     def do_destroy(self, arg):
         """
         Deletes an instance based on
@@ -185,6 +199,18 @@ class HBNBCommand(cmd.Cmd):
                     obj.__dict__[k] = v
         storage.save()
 
+    def do_count(self, args):
+        """Count current number of class instances"""
+        if not args:
+            print("** class name is missing **")
+        elif args.split()[0] not in HBNBCommand.__class_names:
+            print("** class doesn't exist **")
+        else:
+            count = 0
+            for k in models.storage.all():
+                if args == k.split('.')[0]:
+                    count += 1
+            print(count)
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
