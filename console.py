@@ -86,7 +86,7 @@ class HBNBCommand(cmd.Cmd):
         elif len(arg) < 2:
             print("** instance id missing **")
         else:
-            show_class = models.storage.all
+            show_class = models.storage.all()
             key = arg[0] + '.' + arg[1]
             if key in show_class:
                 print(show_class[key])
