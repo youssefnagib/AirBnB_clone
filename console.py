@@ -45,14 +45,12 @@ class HBNBCommand(cmd.Cmd):
     # __class_names = {"Amenity": Amenity, "BaseModel": BaseModel,
     # "City": City, "Place": Place, "Review": Review,
     # "State": State, "User": User}
-    __flag = 0
 
     def precmd(self, line):
         """ Edit given command to allow second type of input"""
         if not sys.stdin.isatty():
             print()
         if '.' in line:
-            HBNBCommand.__flag = 1
             line = line.replace('.', ' ').replace('(', ' ').replace(')', ' ')
             cmd_argv = line.split()
             cmd_argv[0], cmd_argv[1] = cmd_argv[1], cmd_argv[0]
